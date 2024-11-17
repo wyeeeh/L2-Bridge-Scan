@@ -61,4 +61,8 @@ const Home: NextPage = () => {
   );
 };
 
-export default Home;
+{/*export default Home;*/}
+
+import show_StatsCard from './show_StatsCard';
+
+export default show_StatsCard;
