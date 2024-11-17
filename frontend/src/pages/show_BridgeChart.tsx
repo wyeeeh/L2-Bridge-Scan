@@ -1,6 +1,21 @@
 import _BridgeChart from './_BridgeChart';
+import { useEffect, useState } from 'react';
 
 export default function show_BridgeChart() {
+  const [data, setData] = useState<any[]>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetch('/api/api');
+      const data = await response.json();
+      setData(data);
+      console.log("------");
+      console.log(data);
+      console.log("=----=");
+    };
+
+    fetchData();
+  }, []);
+
   // 模拟数据
   const mockData = {
     bridgeStats: {
