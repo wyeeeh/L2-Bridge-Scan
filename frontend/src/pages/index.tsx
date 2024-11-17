@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card"
 
 
-import Show_StatsCard from './show_StatsCard';
+import Show_BridgeChart from './show_BridgeChart';
 import { taiko } from 'wagmi/chains';
 
 
@@ -38,7 +38,7 @@ const Home: NextPage = () => {
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           {/* <Show_StatsCard /> */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1em' }}>
-            <Show_StatsCard />
+            <Show_BridgeChart />
           </div>
         </div>
       </div>
@@ -46,11 +46,9 @@ const Home: NextPage = () => {
   );
 };
 
-{/*export default Home;
-import show_SankeyChart from './show_SankeyChart'
-export default show_SankeyChart;*/}
 
+export default Home;
 
-import show_BridgeChart from './show_BridgeChart';
-
-export default show_BridgeChart;
+{/*import show_SankeyChart from './show_SankeyChart'
+export default show_SankeyChart;
+export default show_BridgeChart;*/}
