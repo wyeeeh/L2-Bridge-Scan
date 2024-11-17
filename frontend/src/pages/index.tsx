@@ -1,5 +1,8 @@
-import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { RainbowKitProvider, ConnectButton } from '@rainbow-me/rainbowkit';
+
 import type { NextPage } from 'next';
+import Head from 'next/head';
+import styles from '../styles/Home.module.css';
 
 import {
   Card,
@@ -11,58 +14,45 @@ import {
 } from "@/components/ui/card"
 
 
+import Show_StatsCard from './show_StatsCard';
+import { taiko } from 'wagmi/chains';
+
+
 const Home: NextPage = () => {
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', padding: 12 }}>
-        <ConnectButton />
+    <RainbowKitProvider initialChain={taiko}>
+          <div className={styles.container}>
+        <Head>
+          <title>L2 Bridge Scan</title>
+          <meta
+            content="Created by THUBA Team"
+            name="description"
+          />
+        </Head>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3em' }}>
-        <Card>
-          <CardHeader>
-            <CardTitle>Card Title 1</CardTitle>
-            <CardDescription>Card Description 1</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p>Card Content 1</p>
-          </CardContent>
-          <CardFooter>
-            <p>Card Footer 1</p>
-          </CardFooter>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Card Title 2</CardTitle>
-            <CardDescription>Card Description 2</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p>Card Content 2</p>
-          </CardContent>
-          <CardFooter>
-            <p>Card Footer 2</p>
-          </CardFooter>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Card Title 3</CardTitle>
-            <CardDescription>Card Description 3</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p>Card Content 3</p>
-          </CardContent>
-          <CardFooter>
-            <p>Card Footer 3</p>
-          </CardFooter>
-        </Card>
+      <div>
+        {/* <ConnectWalletButton /> */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '2em' }}>
+          <ConnectButton />
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          {/* <Show_StatsCard /> */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1em' }}>
+            <Show_StatsCard />
+          </div>
+        </div>
       </div>
-    </div>
-    </div>
+    </RainbowKitProvider>
   );
 };
 
-{/*export default Home;*/}
 
-import show_StatsCard from './show_StatsCard';
+{/*export default Home;
 
-export default show_StatsCard;
+import show_BridgeChart from './show_BridgeChart';
+
+export default show_BridgeChart;
+*/}
+import Login from './Login'
+
+export default Login;
