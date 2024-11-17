@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, Treemap } from 'recharts';
 import { Card, Title, TabGroup, TabList, Tab } from "@tremor/react";
+import SankeyChart from './SankeyChart';
 
 interface BridgeStats {
   totalBridgers: number;
@@ -20,18 +21,36 @@ interface Transaction {
   token: string;
 }
 
+interface Node {
+  name: string;
+  depth?: number; // 新增属性：节点深度
+}
+
+interface Link {
+  source: number | string;
+  target: number | string;
+  value: number;
+}
+
+interface SankeyData {
+  nodes: Node[];
+  links: Link[];
+}
+
 interface BridgeChartProps {
   bridgeStats: BridgeStats;
   dailyData: Array<{ date: string; transactions: number; users: number }>;
   tokenDistribution: Array<{ name: string; value: number; fill: string }>;
   recentTransactions: Transaction[];
+  sankeydata: SankeyData;
 }
 
 export default function BridgeChart({
   bridgeStats,
   dailyData,
   tokenDistribution,
-  recentTransactions
+  recentTransactions,
+  sankeydata,
 }: BridgeChartProps) {
   const [selectedDuration, setSelectedDuration] = useState('24h');
   const handleDurationChange = (e) => {
@@ -42,6 +61,7 @@ export default function BridgeChart({
   const handleNetworkChange = (e) => {
     setSelectedNetwork(e.target.value);
   };
+  console.debug('Sankeydata received in BridgeChart:', sankeydata);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -153,6 +173,11 @@ export default function BridgeChart({
             </tbody>
           </table>
         </div>
+      </Card>
+
+      <Card className="border-2 border-blue-300 rounded-lg">
+        <h1>桑基图</h1>
+        <SankeyChart data={sankeydata} />
       </Card>
     </div>
   );
