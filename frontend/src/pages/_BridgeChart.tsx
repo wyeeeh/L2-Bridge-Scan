@@ -6,9 +6,6 @@ import * as d3 from 'd3';
 import { sankey, sankeyLinkHorizontal } from 'd3-sankey'; // 导入 sankey 相关函数
 import { AreaChart, XAxis, YAxis, Tooltip, Area, Treemap, ResponsiveContainer } from 'recharts'; // 导入 recharts 组件
 
-
-
-
 // 桑基图组件
 const SankeyChart = ({ data, width, height }) => {
   const createSankeyChart = (element, data, width, height) => {
@@ -81,32 +78,45 @@ const SankeyChart = ({ data, width, height }) => {
 
       
       // 添加文本标签
-      const text = svg.append('g')
-        .selectAll('.label')
-        .data(finalNodes)
-        .enter().append('text')
-        .attr('x', (d) => d.x0 - 6) // 可能需要根据节点的实际宽度调整这个值
-        .attr('y', (d) => (d.y1 + d.y0) / 2)
+// 添加文本标签
+const text = svg.append('g')
+  .selectAll('.label')
+  .data(finalNodes)
+  .enter().append('text')
+  .attr('x', (d) => d.x0 - 6)
+  .attr('y', (d) => (d.y1 + d.y0) / 2)
+  .attr('dy', '0.35em')
+  .attr('text-anchor', 'end')
+  .text((d) => d.name)
+  .style('font-size', '12px')
+  .style('fill', '#000');
+
+  // 特别处理 depth 为 0 的节点
+  finalNodes.forEach(node => {
+    if (node.depth === 0) {
+      console.log(`Adding label for node with name: ${node.name}, depth: ${node.depth}`);
+      svg.append('text')
+        .attr('x', () => {
+          if (node.x0 < 10) { // 如果节点非常接近左边界
+            return node.x0 + 16; // 将文本标签进一步向右移动
+          } else {
+            return node.x0 - 6; // 否则保持原来的对齐方式
+          }
+        })
+        .attr('y', (node.y1 + node.y0) / 2)
         .attr('dy', '0.35em')
-        .attr('text-anchor', 'end')
-        .text((d) => d.name)
+        .attr('text-anchor', () => {
+          if (node.x0 < 10) { // 如果节点非常接近左边界
+            return 'start'; // 文本标签靠左对齐
+          } else {
+            return 'end'; // 否则靠右对齐
+          }
+        })
+        .text(node.name)
         .style('font-size', '12px')
         .style('fill', '#000');
-
-      // 如果发现深度为 0 的节点文本没有正确显示，可以尝试下面的代码：
-      finalNodes.forEach(node => {
-        if (node.depth === 0) {
-          console.log(`Adding label for node with name: ${node.name}, depth: ${node.depth}`);
-          svg.append('text')
-            .attr('x', node.x0 - 6)
-            .attr('y', (node.y1 + node.y0) / 2)
-            .attr('dy', '0.35em')
-            .attr('text-anchor', 'end')
-            .text(node.name)
-            .style('font-size', '12px')
-            .style('fill', '#000');
-        }
-      });
+    }
+  });
 
     // 检查是否有节点的文本标签未被添加
     nodes.forEach((node, index) => {
