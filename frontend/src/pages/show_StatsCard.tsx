@@ -1,6 +1,6 @@
 import StatsCard from './StatsCard';
 
-export default function show_StatsCard() {
+export default function Show_StatsCard() {
   // 这里可以添加获取数据的逻辑
   const statsData = {
     totalTransactions: 15234,

@@ -46,14 +46,10 @@ const Home: NextPage = () => {
   );
 };
 
-
 {/*export default Home;
-
-
-
 import show_SankeyChart from './show_SankeyChart'
-
 export default show_SankeyChart;*/}
+
 
 import show_BridgeChart from './show_BridgeChart';
 
