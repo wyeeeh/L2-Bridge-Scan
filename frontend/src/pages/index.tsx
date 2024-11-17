@@ -1,5 +1,4 @@
-import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
+import { RainbowKitProvider, ConnectButton } from '@rainbow-me/rainbowkit';
 
 import type { NextPage } from 'next';
 import Head from 'next/head';
@@ -16,7 +15,7 @@ import {
 
 
 import Show_StatsCard from './show_StatsCard';
-import { celo, manta, taiko } from 'viem/chains';
+import { taiko } from 'wagmi/chains';
 
 
 const Home: NextPage = () => {
