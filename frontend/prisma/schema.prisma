@@ -1,0 +1,32 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model af_cross_tx_l1tol2s {
+  token_id         String
+  transaction_hash Bytes     @db.ByteA
+  src_owner        Bytes?    @db.ByteA
+  dest_owner       Bytes?    @db.ByteA
+  token_address    Bytes?    @db.ByteA
+  src_chain_id     BigInt?
+  dest_chain_id    BigInt?
+  amount           Decimal?  @db.Decimal(100, 0)
+  fee              Decimal?  @db.Decimal(100, 0)
+  block_number     BigInt?
+  block_timestamp  BigInt?
+  create_time      DateTime @default(now()) @db.Timestamp
+  update_time      DateTime @default(now()) @db.Timestamp
+
+  @@id([token_id, transaction_hash], name: "af_cross_tx_l1tol2s_pkey")
+}
