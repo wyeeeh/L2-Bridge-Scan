@@ -30,7 +30,7 @@ const SankeyChart = ({ data, width, height }) => {
       // 准备数据
       const { nodes, links } = sankeyLayout(data);
 
-      const maxDepth = 4;
+      const maxDepth = 10;
       const filteredNodes = nodes.filter(node => node.depth <= maxDepth);
       const filteredLinks = links.filter(link => {
         const sourceNode = nodes.find(node => node.index === link.source.index);
