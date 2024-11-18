@@ -33,7 +33,7 @@ function OptionSelect({
             value={value}
             onValueChange={onChange}
         >
-            <SelectTrigger className={`${className} shadow-md hover:shadow-lg transition-shadow`}>
+            <SelectTrigger className={`${className} shadow-md hover:shadow-lg transition-shadow text-md`}>
                 <SelectValue placeholder={placeholder}>
                     {options.find(opt => opt.value === value)?.label}
                 </SelectValue>
