@@ -5,14 +5,7 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+
 
 
 import Show_BridgeChart from './show_BridgeChart';
@@ -46,7 +39,7 @@ const Home: NextPage = () => {
                   alt="L2 Bridge"
                   className="w-12 h-12"
                 />
-                <span className="text-2xl font-semibold">L2 Bridge Scan</span>
+                <span className="text-2xl font-bold font-outfit">L2 Bridge Scan</span>
               </div>
               <ConnectButton />
             </div>

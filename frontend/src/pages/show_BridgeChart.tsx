@@ -1,6 +1,9 @@
 import _BridgeChart from './_BridgeChart';
+import { useState } from 'react';
+import { BridgeChartProps } from './_BridgeChart';
 
-export default function show_BridgeChart() {
+export default function show_BridgeChart({ languageOptions, onLanguageChange }: BridgeChartProps) {
+  const [language, setLanguage] = useState<'en' | 'zh'>('en');
   // 模拟数据
   const mockData = {
     bridgeStats: {
@@ -174,6 +177,8 @@ export default function show_BridgeChart() {
 
   return (
     <_BridgeChart
+      language={language}
+      onLanguageChange={setLanguage}
       bridgeStats={mockData.bridgeStats}
       dailyData={mockData.dailyData}
       tokenDistribution={mockData.tokenDistribution}
