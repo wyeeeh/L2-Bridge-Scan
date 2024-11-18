@@ -5,12 +5,11 @@ export default function show_BridgeChart() {
   const [data, setData] = useState<any[]>([]);
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch('/api/api');
+      const queryText = "SELECT * FROM af_cross_tx_l1tol2s LIMIT 5";
+      const response = await fetch(`/api/api?queryText=${encodeURIComponent(queryText)}`);
       const data = await response.json();
       setData(data);
-      console.log("------");
       console.log(data);
-      console.log("=----=");
     };
 
     fetchData();

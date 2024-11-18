@@ -8,9 +8,11 @@ export default async function queryDatabase(req: NextApiRequest, res: NextApiRes
         connectionString: 'postgresql://postgres:123456@localhost:5432/taiko',
     });
 
+    const { queryText } = req.query;
+
     try {
         await client.connect();
-        const result = await client.query('SELECT * from af_cross_tx_l1tol2s LIMIT 5;');
+        const result = await client.query(queryText);
         console.log(result);
         res.status(200).json(result.rows);
     } catch (err) {
