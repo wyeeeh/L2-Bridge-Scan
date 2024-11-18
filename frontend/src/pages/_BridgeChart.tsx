@@ -24,99 +24,99 @@ const SankeyChart = ({ data, width, height }) => {
 
     // 定义桑基图布局
     const sankeyLayout = sankey<Node, Link>()
-        .nodeWidth(15)
-        .nodePadding(10)
-        .extent([[1, 1], [width - 1, height - 6]]);
-      // 准备数据
-      const { nodes, links } = sankeyLayout(data);
+      .nodeWidth(15)
+      .nodePadding(10)
+      .extent([[1, 1], [width - 1, height - 6]]);
+    // 准备数据
+    const { nodes, links } = sankeyLayout(data);
 
-      const maxDepth = 10;
-      const filteredNodes = nodes.filter(node => node.depth <= maxDepth);
-      const filteredLinks = links.filter(link => {
-        const sourceNode = nodes.find(node => node.index === link.source.index);
-        const targetNode = nodes.find(node => node.index === link.target.index);
-        return sourceNode && targetNode && sourceNode.depth <= maxDepth && targetNode.depth <= maxDepth;
-      });
-    
+    const maxDepth = 10;
+    const filteredNodes = nodes.filter(node => node.depth <= maxDepth);
+    const filteredLinks = links.filter(link => {
+      const sourceNode = nodes.find(node => node.index === link.source.index);
+      const targetNode = nodes.find(node => node.index === link.target.index);
+      return sourceNode && targetNode && sourceNode.depth <= maxDepth && targetNode.depth <= maxDepth;
+    });
 
-      // 重新计算布局
-      const { nodes: finalNodes, links: finalLinks } = sankeyLayout({
-        nodes: filteredNodes,
-        links: filteredLinks
-      });
 
-      const colorScale = d3.scaleOrdinal(d3.schemePastel1.map(color => {
-        const hslColor = d3.hsl(color);
-        hslColor.s = Math.min(1, hslColor.s + 0.3); // 提升饱和度，但不超过 1
-        return hslColor;
-      }));
+    // 重新计算布局
+    const { nodes: finalNodes, links: finalLinks } = sankeyLayout({
+      nodes: filteredNodes,
+      links: filteredLinks
+    });
 
-      // 绘制链接
-      const link = svg.append('g')
-        .selectAll('.link')
-        .data(finalLinks)
-        .enter().append('path')
-        .attr('class', 'link')
-        .attr('d', sankeyLinkHorizontal())
-        .style('stroke-width', (d) => Math.max(1, d.width))
-        .style('fill', 'none')
-        .style('stroke', (d) => colorScale(d.source.name)) // 使用源节点的颜色
-        .style('opacity', 0.5);
+    const colorScale = d3.scaleOrdinal(d3.schemePastel1.map(color => {
+      const hslColor = d3.hsl(color);
+      hslColor.s = Math.min(1, hslColor.s + 0.3); // 提升饱和度，但不超过 1
+      return hslColor;
+    }));
 
-      // 绘制节点
-      const node = svg.append('g')
-        .selectAll('.node')
-        .data(finalNodes)
-        .enter().append('rect')
-        .attr('class', 'node')
-        .attr('x', (d) => d.x0)
-        .attr('y', (d) => d.y0)
-        .attr('height', (d) => d.y1 - d.y0)
-        .attr('width', (d) => d.x1 - d.x0)
-        .style('fill', (d) => colorScale(d.name))
-        .style('stroke', '#fff');
+    // 绘制链接
+    const link = svg.append('g')
+      .selectAll('.link')
+      .data(finalLinks)
+      .enter().append('path')
+      .attr('class', 'link')
+      .attr('d', sankeyLinkHorizontal())
+      .style('stroke-width', (d) => Math.max(1, d.width))
+      .style('fill', 'none')
+      .style('stroke', (d) => colorScale(d.source.name)) // 使用源节点的颜色
+      .style('opacity', 0.5);
 
-      
-      // 添加文本标签
-// 添加文本标签
-const text = svg.append('g')
-  .selectAll('.label')
-  .data(finalNodes)
-  .enter().append('text')
-  .attr('x', (d) => d.x0 - 6)
-  .attr('y', (d) => (d.y1 + d.y0) / 2)
-  .attr('dy', '0.35em')
-  .attr('text-anchor', 'end')
-  .text((d) => d.name)
-  .style('font-size', '12px')
-  .style('fill', '#000');
+    // 绘制节点
+    const node = svg.append('g')
+      .selectAll('.node')
+      .data(finalNodes)
+      .enter().append('rect')
+      .attr('class', 'node')
+      .attr('x', (d) => d.x0)
+      .attr('y', (d) => d.y0)
+      .attr('height', (d) => d.y1 - d.y0)
+      .attr('width', (d) => d.x1 - d.x0)
+      .style('fill', (d) => colorScale(d.name))
+      .style('stroke', '#fff');
 
-  // 特别处理 depth 为 0 的节点
-  finalNodes.forEach(node => {
-    if (node.depth === 0) {
-      console.log(`Adding label for node with name: ${node.name}, depth: ${node.depth}`);
-      svg.append('text')
-        .attr('x', () => {
-          if (node.x0 < 10) { // 如果节点非常接近左边界
-            return node.x0 + 16; // 将文本标签进一步向右移动
-          } else {
-            return node.x0 - 6; // 否则保持原来的对齐方式
-          }
-        })
-        .attr('y', (node.y1 + node.y0) / 2)
-        .attr('dy', '0.35em')
-        .attr('text-anchor', () => {
-          if (node.x0 < 10) { // 如果节点非常接近左边界
-            return 'start'; // 文本标签靠左对齐
-          } else {
-            return 'end'; // 否则靠右对齐
-          }
-        })
-        .text(node.name)
-        .style('font-size', '12px')
-        .style('fill', '#000');
-    }
-  });
+
+    // 添加文本标签
+    // 添加文本标签
+    const text = svg.append('g')
+      .selectAll('.label')
+      .data(finalNodes)
+      .enter().append('text')
+      .attr('x', (d) => d.x0 - 6)
+      .attr('y', (d) => (d.y1 + d.y0) / 2)
+      .attr('dy', '0.35em')
+      .attr('text-anchor', 'end')
+      .text((d) => d.name)
+      .style('font-size', '12px')
+      .style('fill', '#000');
+
+    // 特别处理 depth 为 0 的节点
+    finalNodes.forEach(node => {
+      if (node.depth === 0) {
+        console.log(`Adding label for node with name: ${node.name}, depth: ${node.depth}`);
+        svg.append('text')
+          .attr('x', () => {
+            if (node.x0 < 10) { // 如果节点非常接近左边界
+              return node.x0 + 16; // 将文本标签进一步向右移动
+            } else {
+              return node.x0 - 6; // 否则保持原来的对齐方式
+            }
+          })
+          .attr('y', (node.y1 + node.y0) / 2)
+          .attr('dy', '0.35em')
+          .attr('text-anchor', () => {
+            if (node.x0 < 10) { // 如果节点非常接近左边界
+              return 'start'; // 文本标签靠左对齐
+            } else {
+              return 'end'; // 否则靠右对齐
+            }
+          })
+          .text(node.name)
+          .style('font-size', '12px')
+          .style('fill', '#000');
+      }
+    });
 
     // 检查是否有节点的文本标签未被添加
     nodes.forEach((node, index) => {
@@ -215,15 +215,13 @@ const _BridgeChart = ({
               <option value="30d">30天</option>
             </select>
           </div>
-          <button className="px-4 py-2 bg-blue-400 text-white rounded-lg w-32">
-            连接钱包
-          </button>
+
         </div>
       </div>
 
       {/* 统计卡片 */}
       <div className="grid grid-cols-3 gap-4 mb-8">
-        <Card className="border-2 border-blue-300 rounded-lg"> 
+        <Card className="border-2 border-blue-300 rounded-lg">
           <Title>总桥接用户数</Title>
           <p className="text-2xl font-bold">{bridgeStats.totalBridgers}</p>
         </Card>
@@ -250,7 +248,7 @@ const _BridgeChart = ({
             </AreaChart>
           </ResponsiveContainer>
         </Card>
-        
+
         <Card className="grid place-items-center h-full border-2 border-blue-300 rounded-lg">
           <Title className="mb-4">热门桥接代币</Title>
           <div className="grid place-items-center w-full h-full">
@@ -311,15 +309,15 @@ const _BridgeChart = ({
         </div>
       </Card>
 
-  {/* 桑基图卡片 */}
-  <div className="mt-8">
-    <Card className="border-2 border-blue-300 rounded-lg">
-      <Title>桑基图</Title>
-      <div className="flex justify-center items-center">
-        <SankeyChart data={sankeydata} width={sankeyWidth} height={sankeyHeight} />
+      {/* 桑基图卡片 */}
+      <div className="mt-8">
+        <Card className="border-2 border-blue-300 rounded-lg">
+          <Title>桑基图</Title>
+          <div className="flex justify-center items-center">
+            <SankeyChart data={sankeydata} width={sankeyWidth} height={sankeyHeight} />
+          </div>
+        </Card>
       </div>
-    </Card>
-  </div>
     </div>
   );
 };
