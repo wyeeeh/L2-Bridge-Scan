@@ -5,8 +5,9 @@ import { Card, Title, TabGroup, TabList, Tab } from "@tremor/react";
 import * as d3 from 'd3';
 import { sankey, sankeyLinkHorizontal } from 'd3-sankey'; // 导入 sankey 相关函数
 import { AreaChart, XAxis, YAxis, Tooltip, Area, Treemap, ResponsiveContainer } from 'recharts'; // 导入 recharts 组件
+import OptionSelect from './OptionSelect';
 
-// 桑基图组件
+// 桑基图组件 
 const SankeyChart = ({ data, width, height }) => {
   const createSankeyChart = (element, data, width, height) => {
     // 清除现有的SVG元素
@@ -187,16 +188,40 @@ const _BridgeChart = ({
   sankeyWidth = 800,
   sankeyHeight = 500,
 }: BridgeChartProps) => {
-  const [selectedDuration, setSelectedDuration] = useState('24h');
-  const handleDurationChange = (e) => {
-    setSelectedDuration(e.target.value);
-  };
-
-  const [selectedNetwork, setSelectedNetwork] = useState('Taiko');
-  const handleNetworkChange = (e) => {
-    setSelectedNetwork(e.target.value);
-  };
-
+  const [selectedDuration, setSelectedDuration] = useState('24h')
+  const durationOptions = [
+    { value: '24h', label: '24 hours' },
+    { value: '7d', label: '7 days' },
+    { value: '30d', label: '30 days' }
+  ]
+  // 处理数据更新
+  const handleDurationChange = (value: string) => {
+    setSelectedDuration(value)
+    // 这里可以调用API或更新数据
+    // updateChartData(value, selectedBridge)
+  }
+  // 桥选择
+  const [selectedBridge, setSelectedBridge] = useState('Taiko')
+  const bridgeOptions = [
+    { value: 'Taiko', label: 'Taiko' },
+    { value: 'Linea', label: 'Linea' }
+  ]
+  const handleBridgeChange = (value: string) => {
+    setSelectedBridge(value)
+    // 这里可以调用API或更新数据
+    // updateChartData(selectedDuration, value)
+  }
+  // 更新数据的函数
+  const updateChartData = async (duration: string, bridge: string) => {
+    try {
+      // 这里添加你的数据获取逻辑
+      // const response = await fetch(`/api/bridge-data?duration=${duration}&bridge=${bridge}`)
+      // const data = await response.json()
+      // 更新图表数据
+    } catch (error) {
+      console.error('Error fetching data:', error)
+    }
+  }
   console.debug('Sankeydata received in BridgeChart:', sankeydata);
 
   return (
@@ -205,15 +230,8 @@ const _BridgeChart = ({
         <h1 className="text-2xl font-bold">桥接统计数据</h1>
         <div className="flex gap-10">
           <div className="relative">
-            <select
-              value={selectedDuration}
-              onChange={handleDurationChange}
-              className="px-4 py-2 bg-white border-2 border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
-            >
-              <option value="24h">24小时</option>
-              <option value="7d">7天</option>
-              <option value="30d">30天</option>
-            </select>
+            {/* select 组件 */}
+            <OptionSelect options={durationOptions} value={selectedDuration} onChange={handleDurationChange} />
           </div>
 
         </div>
@@ -269,14 +287,8 @@ const _BridgeChart = ({
         <div className="flex justify-between items-center mb-4">
           <Title>最新桥接交易</Title>
           <div className="relative">
-            <select
-              value={selectedNetwork}
-              onChange={handleNetworkChange}
-              className="px-4 py-2 bg-white border-2 border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
-            >
-              <option value="Taiko">Taiko</option>
-              <option value="Linea">Linea</option>
-            </select>
+            <OptionSelect options={bridgeOptions} value={selectedBridge} onChange={handleBridgeChange} />
+
           </div>
         </div>
         <div className="overflow-x-auto">
