@@ -69,25 +69,25 @@ export default function BridgeChart({
         <h1 className="text-2xl font-bold">桥接统计数据</h1>
         <div className="flex gap-10">
           <div className="relative">
-              <select
-                value={selectedDuration}
-                onChange={handleDurationChange}
-                className="px-4 py-2 bg-white border-2 border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
-              >
-                <option value="24h">24小时</option>
-                <option value="7d">7天</option>
-                <option value="30d">30天</option>
-              </select>
-            </div>
-          <button className="px-4 py-2 bg-blue-400 text-white rounded-lg w-32">
+            <select
+              value={selectedDuration}
+              onChange={handleDurationChange}
+              className="px-4 py-2 bg-white border-2 border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
+            >
+              <option value="24h">24小时</option>
+              <option value="7d">7天</option>
+              <option value="30d">30天</option>
+            </select>
+          </div>
+          {/* <button className="px-4 py-2 bg-blue-400 text-white rounded-lg w-32">
             连接钱包
-          </button>
+          </button> */}
         </div>
       </div>
 
       {/* 统计卡片 */}
       <div className="grid grid-cols-3 gap-4 mb-8">
-        <Card className="border-2 border-blue-300 rounded-lg"> 
+        <Card className="border-2 border-blue-300 rounded-lg">
           <Title>总桥接用户数</Title>
           <p className="text-2xl font-bold">{bridgeStats.totalBridgers}</p>
         </Card>
@@ -114,37 +114,37 @@ export default function BridgeChart({
             </AreaChart>
           </ResponsiveContainer>
         </Card>
-        
+
         <Card className="grid place-items-center h-full border-2 border-blue-300 rounded-lg">
-            <Title className="mb-4">热门桥接代币</Title>
-            <div className="grid place-items-center w-full h-full">
-                <ResponsiveContainer width="100%" height={300}>
-                <Treemap
-                    data={tokenDistribution}
-                    dataKey="value"
-                    aspectRatio={4 / 3}
-                    stroke="#fff"
-                />
-                </ResponsiveContainer>
-            </div>
+          <Title className="mb-4">热门桥接代币</Title>
+          <div className="grid place-items-center w-full h-full">
+            <ResponsiveContainer width="100%" height={300}>
+              <Treemap
+                data={tokenDistribution}
+                dataKey="value"
+                aspectRatio={4 / 3}
+                stroke="#fff"
+              />
+            </ResponsiveContainer>
+          </div>
         </Card>
       </div>
 
       {/* 最新交易表格 */}
       <Card className="border-2 border-blue-300 rounded-lg">
         <div className="flex justify-between items-center mb-4">
-            <Title>最新桥接交易</Title>
-            <div className="relative">
-              <select
-                value={selectedNetwork}
-                onChange={handleNetworkChange}
-                className="px-4 py-2 bg-white border-2 border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
-              >
-                <option value="Taiko">Taiko</option>
-                <option value="Linea">Linea</option>
-              </select>
-            </div>
+          <Title>最新桥接交易</Title>
+          <div className="relative">
+            <select
+              value={selectedNetwork}
+              onChange={handleNetworkChange}
+              className="px-4 py-2 bg-white border-2 border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
+            >
+              <option value="Taiko">Taiko</option>
+              <option value="Linea">Linea</option>
+            </select>
           </div>
+        </div>
         <div className="overflow-x-auto">
           <table className="min-w-full">
             <thead>
