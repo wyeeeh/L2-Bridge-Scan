@@ -64,7 +64,7 @@ const Sankey: React.FC<SankeyProps> = ({ data, width, height }) => {
         const colorScale = d3.scaleOrdinal(d3.schemePastel1.map(color => {
             const hslColor = d3.hsl(color);
             hslColor.s = Math.min(1, hslColor.s + 0.3);
-            return hslColor;
+            return hslColor.toString();
         }));
 
         // 绘制链接

@@ -41,7 +41,7 @@ interface SankeyData {
   links: Link[];
 }
 
-interface BridgeChartProps {
+export interface BridgeChartProps {
   bridgeStats: BridgeStats;
   dailyData: Array<{ date: string; transactions: number; users: number }>;
   tokenDistribution: Array<{ name: string; value: number; fill: string }>;

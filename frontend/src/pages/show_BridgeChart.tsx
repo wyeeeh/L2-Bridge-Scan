@@ -2,7 +2,7 @@ import _BridgeChart from './_BridgeChart';
 import { useState } from 'react';
 import { BridgeChartProps } from './_BridgeChart';
 
-export default function show_BridgeChart({ languageOptions, onLanguageChange }: BridgeChartProps) {
+export default function show_BridgeChart({ }: BridgeChartProps) {
   const [language, setLanguage] = useState<'en' | 'zh'>('en');
   // 模拟数据
   const mockData = {
@@ -184,6 +184,8 @@ export default function show_BridgeChart({ languageOptions, onLanguageChange }: 
       tokenDistribution={mockData.tokenDistribution}
       recentTransactions={mockData.recentTransactions}
       sankeydata={mockData.sankeyData}
+      sankeyWidth={800}
+      sankeyHeight={500}
     />
   );
 }
