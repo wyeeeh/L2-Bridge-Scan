@@ -6,6 +6,90 @@ import * as d3 from 'd3';
 import Sankey from './Sankey';
 import { AreaChart, XAxis, YAxis, Tooltip, Area, Treemap, ResponsiveContainer } from 'recharts'; // 导入 recharts 组件
 import OptionSelect from './OptionSelect';
+import axios from "axios";
+
+
+const tokenInfo: { [name: string]: { decimal: number; name: string } } = {  
+  'ETH': {
+    decimal: 1e18,
+    name: 'ethereum',
+  },
+  'USDC': {
+    decimal: 1e6,
+    name: 'usd-coin',
+  },
+  'USDT': {
+    decimal: 1e6,
+    name: 'tether',
+  },
+  'DAI': {
+    decimal: 1e18,
+    name: 'dai',
+  },
+  'crvUSD': {
+    decimal: 1e18,
+    name: 'crvusd',
+  },
+  'BTC': {
+    decimal: 1e8,
+    name: 'bitcoin',
+  },
+  'WBTC': {
+    decimal: 1e8,
+    name: 'wrapped-bitcoin',
+  },
+  'BNB': {
+    decimal: 1e18,
+    name: 'binancecoin',
+  },
+}
+
+const fillList = ['#8884d8', '#82ca9d', '#ffc658', '#ff7f50', '#ff6347', '#ff4500', '#ff0000', '#ff1493', '#ff69b4']
+
+
+export interface ExchangeRates {
+  [name: string]: number; 
+}
+
+export async function fetchExchangeRates(tokens: string[]): Promise<ExchangeRates> {
+  try {
+    // 构造 API 请求地址（以 CoinGecko 为例）
+    // 通过 tokenInfo 获取 token 的名称
+    
+    const names = tokens.map(token => tokenInfo[token].name);
+    const exchangeRates = await fetch(`/api/api_price?ids=${names.map(encodeURIComponent).join(",")}`);
+    const json_ExchangeRates = await exchangeRates.json();
+
+    //获取ETH的价格
+    const ethPrice = json_ExchangeRates['ethereum'].usd;
+
+    // 解析汇率
+    const rates: ExchangeRates = {};
+    tokens.forEach((token) => {
+        rates[token] = json_ExchangeRates[tokenInfo[token].name].usd / ethPrice;
+    });
+
+    return rates;
+  } catch (error) {
+    console.error("Error fetching exchange rates:", error);
+    throw new Error("Failed to fetch exchange rates");
+  }
+}
+
+const duration_queryTextMap: Record<string, string[]> = {
+  '24h': [
+    `SELECT DATE(create_time) AS date, COUNT(*) AS transactions, COUNT(DISTINCT src_owner) AS users FROM af_cross_tx_l1tol2s WHERE create_time >= NOW() - INTERVAL '1 day' GROUP BY DATE(create_time) ORDER BY DATE(create_time)`,
+    `SELECT token_id AS name, SUM(amount) AS value FROM af_cross_tx_l1tol2s WHERE create_time >= NOW() - INTERVAL '1 day' GROUP BY name`,
+  ],
+  '7d': [
+    `SELECT DATE(create_time) AS date, COUNT(*) AS transactions, COUNT(DISTINCT src_owner) AS users FROM af_cross_tx_l1tol2s WHERE create_time >= NOW() - INTERVAL '7 day' GROUP BY DATE(create_time) ORDER BY DATE(create_time)`,
+    `SELECT token_id AS name, SUM(amount) AS value FROM af_cross_tx_l1tol2s WHERE create_time >= NOW() - INTERVAL '7 day' GROUP BY name`,
+  ],
+  '30d': [
+    `SELECT DATE(create_time) AS date, COUNT(*) AS transactions, COUNT(DISTINCT src_owner) AS users FROM af_cross_tx_l1tol2s WHERE create_time >= NOW() - INTERVAL '30 day' GROUP BY DATE(create_time) ORDER BY DATE(create_time)`,
+    `SELECT token_id AS name, SUM(amount) AS value FROM af_cross_tx_l1tol2s WHERE create_time >= NOW() - INTERVAL '30 day' GROUP BY name`,
+  ],
+};
 
 
 // 主组件
@@ -16,12 +100,12 @@ interface BridgeStats {
 }
 
 interface Transaction {
-  blockNo: string;
+  block_no: string;
+  from: string;
   to: string;
-  l1TxnHash: string;
   age: string;
-  l2TxnHash: string;
-  value: string;
+  l2txnhash: string;
+  value: number;
   token: string;
 }
 
@@ -52,6 +136,7 @@ export interface BridgeChartProps {
   language: 'en' | 'zh';
   onLanguageChange: (language: 'en' | 'zh') => void;
 }
+
 type LanguageType = 'en' | 'zh';
 
 const languageOptions: { value: LanguageType; label: string }[] = [
@@ -78,9 +163,9 @@ const _BridgeChart = ({
       dailyBridgeData: 'Daily Bridge Data',
       popularBridgeTokens: 'Popular Bridge Tokens',
       latestBridgeTransactions: 'Latest Bridge Transactions',
-      blockNo: 'Block No.',
+      block_no: 'Block No.',
       receivingAddress: 'Receiving Address',
-      l1TxHash: 'L1 Transaction Hash',
+      senderAddress: 'Sender Address',
       time: 'Time',
       l2TxHash: 'L2 Transaction Hash',
       amount: 'Amount',
@@ -94,9 +179,9 @@ const _BridgeChart = ({
       dailyBridgeData: '每日桥接数据',
       popularBridgeTokens: '热门桥接代币',
       latestBridgeTransactions: '最新桥接交易',
-      blockNo: '区块号',
+      block_no: '区块号',
       receivingAddress: '接收地址',
-      l1TxHash: 'L1 交易哈希',
+      senderAddress: '发送地址',
       time: '时间',
       l2TxHash: 'L2 交易哈希',
       amount: '数量',
@@ -115,7 +200,7 @@ const _BridgeChart = ({
   const handleDurationChange = (value: string) => {
     setSelectedDuration(value)
     // 这里可以调用API或更新数据
-    // updateChartData(value, selectedBridge)
+    updateChartData(value, selectedBridge)
   }
   // 桥选择
   const [selectedBridge, setSelectedBridge] = useState('Taiko')
@@ -132,9 +217,39 @@ const _BridgeChart = ({
   const updateChartData = async (duration: string, bridge: string) => {
     try {
       // 这里添加你的数据获取逻辑
-      // const response = await fetch(`/api/bridge-data?duration=${duration}&bridge=${bridge}`)
-      // const data = await response.json()
-      // 更新图表数据
+      const [queryText_dailyData, queryText_tokenDistribution] = duration_queryTextMap[duration];
+      // get daily data
+      const response_dailyData = await fetch(`/api/api?queryText=${encodeURIComponent(queryText_dailyData)}`);
+      let json_dailyData = await response_dailyData.json();
+      // reformat daily data
+      dailyData = json_dailyData.map((item: { date: string; transactions: number; users: number }) => {
+        return {
+          date: new Date(item.date).toLocaleDateString(),
+          transactions: Number(item.transactions),
+          users: Number(item.users),
+        };
+      });
+      bridgeStats.totalBridgers = dailyData.reduce((acc: number, item: { users: number }) => acc + item.users, 0),
+      bridgeStats.totalTransactions = dailyData.reduce((acc, item: { transactions: number }) => acc + item.transactions, 0)
+      // get token distribution
+      const response_tokenDistribution = await fetch(`/api/api?queryText=${encodeURIComponent(queryText_tokenDistribution)}`);
+      let json_tokenDistribution = await response_tokenDistribution.json();
+      // get exchange rates for tokens
+      const token_ids = json_tokenDistribution.map((item: { name: string }) => item.name);
+      const exchangeRates = await fetchExchangeRates(token_ids);
+      // reformat token distribution data
+      tokenDistribution = json_tokenDistribution.map((item: { name: string; value: number }, index: number) => {
+        const exchangeRate = exchangeRates[item.name]?exchangeRates[item.name]:1;
+        const tokenDecimal = tokenInfo[item.name]?.decimal || 1e18;
+        return {
+          ...item,
+          value: item.value * exchangeRate / tokenDecimal,
+          fill: fillList[index % fillList.length],
+        };
+      });
+      bridgeStats.totalValueETH = tokenDistribution.reduce((acc, item: { value: number }) => acc + item.value, 0);
+  
+
     } catch (error) {
       console.error('Error fetching data:', error)
     }
@@ -222,9 +337,9 @@ const _BridgeChart = ({
           <table className="min-w-full">
             <thead>
               <tr className="border-b">
-                <th className="px-4 py-2">{texts[language].blockNo}</th>
+                <th className="px-4 py-2">{texts[language].block_no}</th>
+                {/* <th className="px-4 py-2">{texts[language].senderAddress}</th> */}
                 <th className="px-4 py-2">{texts[language].receivingAddress}</th>
-                <th className="px-4 py-2">{texts[language].l1TxHash}</th>
                 <th className="px-4 py-2">{texts[language].time}</th>
                 <th className="px-4 py-2">{texts[language].l2TxHash}</th>
                 <th className="px-4 py-2">{texts[language].amount}</th>
@@ -234,11 +349,11 @@ const _BridgeChart = ({
             <tbody>
               {recentTransactions.map((tx, index) => (
                 <tr key={index} className="border-b">
-                  <th className="px-4 py-2">{tx.blockNo}</th>
+                  <th className="px-4 py-2">{tx.block_no}</th>
+                  {/* <th className="px-4 py-2">{tx.from}</th> */}
                   <th className="px-4 py-2">{tx.to}</th>
-                  <th className="px-4 py-2">{tx.l1TxnHash}</th>
                   <th className="px-4 py-2">{tx.age}</th>
-                  <th className="px-4 py-2">{tx.l2TxnHash}</th>
+                  <th className="px-4 py-2">{tx.l2txnhash}</th>
                   <th className="px-4 py-2">{tx.value}</th>
                   <th className="px-4 py-2">{tx.token}</th>
                 </tr>

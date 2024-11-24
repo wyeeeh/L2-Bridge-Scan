@@ -33,3 +33,17 @@ You can check out [the RainbowKit GitHub repository](https://github.com/rainbow-
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out the [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## Database
+
+```bash
+cd ./backend/hemera-indexer/
+
+make development
+
+source .venv/bin/activate
+
+python3 hemera.py db --create-tables af_cross_tx_l1tol2s --postgres-url postgresql://postgres:123456@localhost:5432/taiko 
+
+python3 hemera.py stream --provider-uri https://rpc.ankr.com/taiko  --start-block 580474 --output-types L1toL2TxOnL2 --batch-size 1 --postgres-url postgresql://postgres:123456@localhost:5432/taiko --config-file config/indexer-config-taiko.yaml --block-batch-size 1 --output postgres
+```
